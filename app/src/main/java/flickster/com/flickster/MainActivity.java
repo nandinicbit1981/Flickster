@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 executeAsyncTask(Constant.MOVIE_POPULAR);
                 break;
             case R.id.menu_top_rated:
+
                 executeAsyncTask(Constant.MOVIE_TOP_RATED);
                 break;
             default:

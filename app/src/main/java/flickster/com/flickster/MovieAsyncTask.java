@@ -10,6 +10,7 @@ import flickster.com.flickster.model.Movie;
 import flickster.com.flickster.model.MovieResponse;
 import flickster.com.flickster.network.APIClient;
 import flickster.com.flickster.network.APIInterface;
+import flickster.com.flickster.util.Constant;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,6 +25,7 @@ public class MovieAsyncTask extends AsyncTask<String, Integer, Void> {
     String sort_order;
     List<Movie> movies;
     Context context;
+    Call<MovieResponse> movieResponse;
 
     public MovieAsyncTask(Context context, String moviePopular) {
         this.sort_order = moviePopular;
@@ -34,7 +36,11 @@ public class MovieAsyncTask extends AsyncTask<String, Integer, Void> {
     protected Void doInBackground(String... option) {
         try {
             APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
-            Call<MovieResponse> movieResponse = apiInterface.getPopularMovieList("de9c335bcf10921c29babb85a73c47dd");
+            if(this.sort_order.equals(Constant.MOVIE_POPULAR)) {
+                movieResponse = apiInterface.getPopularMovieList("de9c335bcf10921c29babb85a73c47dd");
+            } else {
+                movieResponse = apiInterface.getTopRatedMovies("de9c335bcf10921c29babb85a73c47dd");
+            }
             movieResponse.enqueue(new Callback<MovieResponse>() {
                 @Override
                 public void onResponse(Call<MovieResponse> movieResponse, Response<MovieResponse> response) {
