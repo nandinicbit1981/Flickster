@@ -1,5 +1,6 @@
 package flickster.com.flickster.network;
 
+import flickster.com.flickster.util.Constant;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -18,14 +19,11 @@ public class APIClient {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.themoviedb.org/3/movie/")
+                .baseUrl(Constant.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-
-
 
         return retrofit;
     }

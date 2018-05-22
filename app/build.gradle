@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
+    Properties properties = new Properties();
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
     defaultConfig {
         applicationId "flickster.com.flickster"
         minSdkVersion 23
@@ -16,6 +18,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'My_Movie_DB_API_Key', properties.getProperty("My_Movie_DB_API_Key")
+    }
 }
 
 dependencies {
@@ -26,8 +31,10 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
-    compile 'com.android.support:recyclerview-v7:25.4.0'
+    compile 'com.android.support:recyclerview-v7:27.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

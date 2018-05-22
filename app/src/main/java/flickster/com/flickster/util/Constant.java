@@ -7,4 +7,8 @@ package flickster.com.flickster.util;
 public class Constant {
     public static String MOVIE_POPULAR = "popular";
     public static String MOVIE_TOP_RATED = "top_rated";
+    public static String MOVIE_INFO = "movie_info";
+    public static String IMAGE_URL = "http://image.tmdb.org/t/p/w780//";
+    public static String DATE_FORMAT = "yyyy-MM-dd";
+    public static String BASE_URL = "http://api.themoviedb.org/3/movie/";
 }

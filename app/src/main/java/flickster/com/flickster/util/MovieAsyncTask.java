@@ -1,16 +1,18 @@
-package flickster.com.flickster;
+package flickster.com.flickster.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.List;
+import java.util.Properties;
 
+import flickster.com.flickster.BuildConfig;
+import flickster.com.flickster.activity.MainActivity;
 import flickster.com.flickster.model.Movie;
 import flickster.com.flickster.model.MovieResponse;
 import flickster.com.flickster.network.APIClient;
 import flickster.com.flickster.network.APIInterface;
-import flickster.com.flickster.util.Constant;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,6 +29,7 @@ public class MovieAsyncTask extends AsyncTask<String, Integer, Void> {
     Context context;
     Call<MovieResponse> movieResponse;
 
+
     public MovieAsyncTask(Context context, String moviePopular) {
         this.sort_order = moviePopular;
         this.context = context;
@@ -37,9 +40,9 @@ public class MovieAsyncTask extends AsyncTask<String, Integer, Void> {
         try {
             APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
             if(this.sort_order.equals(Constant.MOVIE_POPULAR)) {
-                movieResponse = apiInterface.getPopularMovieList("de9c335bcf10921c29babb85a73c47dd");
+                movieResponse = apiInterface.getPopularMovieList(BuildConfig.My_Movie_DB_API_Key);
             } else {
-                movieResponse = apiInterface.getTopRatedMovies("de9c335bcf10921c29babb85a73c47dd");
+                movieResponse = apiInterface.getTopRatedMovies(BuildConfig.My_Movie_DB_API_Key);
             }
             movieResponse.enqueue(new Callback<MovieResponse>() {
                 @Override
