@@ -2,6 +2,7 @@ package flickster.com.flickster.network;
 
 
 import flickster.com.flickster.model.MovieResponse;
+import flickster.com.flickster.model.ReviewResponse;
 import flickster.com.flickster.model.TrailerResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -22,4 +23,7 @@ public interface APIInterface {
 
     @GET("{id}/videos")
     Call<TrailerResponse> getTrailers(@Path("id") String id, @Query("api_key") String api_key);
+
+    @GET("{id}/reviews")
+    Call<ReviewResponse> getReviews(@Path("id") String id, @Query("api_key") String api_key);
 }

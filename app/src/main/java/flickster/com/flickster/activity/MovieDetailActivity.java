@@ -20,11 +20,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import flickster.com.flickster.R;
+import flickster.com.flickster.data.ReviewAdapter;
 import flickster.com.flickster.data.TrailerAdapter;
 import flickster.com.flickster.interfaces.TrailerClickInterface;
 import flickster.com.flickster.model.Movie;
+import flickster.com.flickster.model.Review;
 import flickster.com.flickster.model.Trailer;
 import flickster.com.flickster.util.Constant;
+import flickster.com.flickster.util.ReviewAsyncTask;
 import flickster.com.flickster.util.TrailerAsyncTask;
 
 public class MovieDetailActivity extends BaseActivity implements TrailerClickInterface{
@@ -48,7 +51,11 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
     @BindView(R.id.trailer_rv)
     RecyclerView trailerRV;
 
+    @BindView(R.id.reviews_rv)
+    RecyclerView reviewsRV;
+
     TrailerAdapter trailerAdapter;
+    ReviewAdapter reviewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +68,15 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
                 .load(Constant.IMAGE_URL + movie.getPosterPath())
                 .into(image_view_thumbnail);
         String releaseDate = movie.getReleaseDate();
+
+        //for trailers
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         trailerRV.setLayoutManager(linearLayoutManager);
 
+        //for reviews
+        linearLayoutManager = new LinearLayoutManager(this);
+        reviewsRV.setLayoutManager(linearLayoutManager);
         try {
             Date date = new SimpleDateFormat(Constant.DATE_FORMAT).parse(releaseDate);
             Calendar cal = Calendar.getInstance();
@@ -83,6 +95,9 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
         // adding trailer information.
         new TrailerAsyncTask(MovieDetailActivity.this, movie.getId().toString()).execute();
 
+        // adding reviews
+        new ReviewAsyncTask(MovieDetailActivity.this, movie.getId().toString()).execute();
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -91,6 +106,12 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
 
         trailerRV.setAdapter(trailerAdapter);
         this.trailerAdapter.notifyDataSetChanged();
+    }
+
+    public void updateReviews(List<Review> reviews) {
+        reviewAdapter = new ReviewAdapter(this, reviews);
+        reviewsRV.setAdapter(reviewAdapter);
+        this.reviewAdapter.notifyDataSetChanged();
     }
 
     @Override
