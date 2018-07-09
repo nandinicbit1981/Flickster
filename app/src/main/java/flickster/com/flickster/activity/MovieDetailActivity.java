@@ -1,5 +1,7 @@
 package flickster.com.flickster.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,12 +21,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import flickster.com.flickster.R;
 import flickster.com.flickster.data.TrailerAdapter;
+import flickster.com.flickster.interfaces.TrailerClickInterface;
 import flickster.com.flickster.model.Movie;
 import flickster.com.flickster.model.Trailer;
 import flickster.com.flickster.util.Constant;
 import flickster.com.flickster.util.TrailerAsyncTask;
 
-public class MovieDetailActivity extends BaseActivity {
+public class MovieDetailActivity extends BaseActivity implements TrailerClickInterface{
 
     String LOG = MovieDetailActivity.class.getCanonicalName();
     @BindView(R.id.md_title)
@@ -84,9 +87,15 @@ public class MovieDetailActivity extends BaseActivity {
     }
 
     public void updateTrailers(List<Trailer> trailers) {
-        trailerAdapter = new TrailerAdapter(this, trailers);
+        trailerAdapter = new TrailerAdapter(this, trailers, this);
 
         trailerRV.setAdapter(trailerAdapter);
         this.trailerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onTrailerClick(String id) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.YOUTUBE_URL + id));
+        startActivity(intent);
     }
 }

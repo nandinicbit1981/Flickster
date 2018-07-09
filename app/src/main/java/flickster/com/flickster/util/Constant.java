@@ -11,4 +11,5 @@ public class Constant {
     public static String IMAGE_URL = "http://image.tmdb.org/t/p/w780//";
     public static String DATE_FORMAT = "yyyy-MM-dd";
     public static String BASE_URL = "http://api.themoviedb.org/3/movie/";
+    public static String YOUTUBE_URL = "http://youtube.com/watch?v=";
 }

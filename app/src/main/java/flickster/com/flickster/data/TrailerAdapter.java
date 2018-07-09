@@ -13,16 +13,18 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import flickster.com.flickster.R;
+import flickster.com.flickster.interfaces.TrailerClickInterface;
 import flickster.com.flickster.model.Trailer;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
 
     List<Trailer> trailers;
     Context context;
-    public TrailerAdapter(Context context, List<Trailer> trailers) {
+    TrailerClickInterface trailerClickInterface;
+    public TrailerAdapter(Context context, List<Trailer> trailers, TrailerClickInterface trailerClickInterface) {
         this.trailers = trailers;
         this.context = context;
-
+        this.trailerClickInterface = trailerClickInterface;
     }
 
     @NonNull
@@ -34,8 +36,14 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TrailerAdapter.TrailerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TrailerAdapter.TrailerViewHolder holder, final int position) {
         Picasso.with(context).load("https://img.youtube.com/vi/"+ trailers.get(position).getKey()+"/0.jpg").into(holder.trailerThumbnail);
+        holder.trailerThumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                trailerClickInterface.onTrailerClick(trailers.get(position).getKey());
+            }
+        });
     }
 
     @Override
