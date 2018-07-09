@@ -1,5 +1,8 @@
 package flickster.com.flickster.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,7 +14,7 @@ import java.util.List;
 /**
  * Created by nandpa on 5/19/18.
  */
-
+@Entity
 public class Movie implements Parcelable {
     @SerializedName("poster_path")
     private String posterPath;
@@ -21,8 +24,10 @@ public class Movie implements Parcelable {
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
+    @Ignore
     @SerializedName("genre_ids")
     private List<Integer> genreIds = new ArrayList<Integer>();
+    @PrimaryKey
     @SerializedName("id")
     private Integer id;
     @SerializedName("original_title")
@@ -41,6 +46,11 @@ public class Movie implements Parcelable {
     private Boolean video;
     @SerializedName("vote_average")
     private Double voteAverage;
+
+    public Movie(){
+
+    }
+
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,
                  Integer voteCount, Boolean video, Double voteAverage) {

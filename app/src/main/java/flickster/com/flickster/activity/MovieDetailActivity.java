@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +20,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import flickster.com.flickster.App;
 import flickster.com.flickster.R;
 import flickster.com.flickster.data.ReviewAdapter;
 import flickster.com.flickster.data.TrailerAdapter;
@@ -57,12 +60,17 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
     TrailerAdapter trailerAdapter;
     ReviewAdapter reviewAdapter;
 
+    @BindView(R.id.fav_btn)
+    ImageButton favBtn;
+
+    Movie movie;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         ButterKnife.bind(this);
-        Movie movie = (Movie) getIntent().getExtras().get(Constant.MOVIE_INFO);
+        movie = (Movie) getIntent().getExtras().get(Constant.MOVIE_INFO);
         tv_title.setText(movie.getTitle());
         Picasso.with(this)
                 .load(Constant.IMAGE_URL + movie.getPosterPath())
@@ -118,5 +126,17 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
     public void onTrailerClick(String id) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.YOUTUBE_URL + id));
         startActivity(intent);
+    }
+
+
+    @OnClick(R.id.fav_btn)
+    public void onBtnClicked() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                App.get().getDB().movieDao().insert(movie);
+            }
+        }).start();
+
     }
 }

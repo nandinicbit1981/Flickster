@@ -37,6 +37,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
         ButterKnife.bind(this);
+
+        recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
         executeAsyncTask(Constant.MOVIE_POPULAR);
     }
 
@@ -44,13 +46,21 @@ public class MainActivity extends BaseActivity {
         progressBar.setVisibility(View.VISIBLE);
         new MovieAsyncTask(this, sort_order).execute();
     }
-    public void updateUI(List<Movie> movieList){
-        progressBar.setVisibility(View.GONE);
-        this.movieList = movieList;
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        this.movieAdapter = new MovieAdapter(this, this.movieList);
-        recyclerView.setAdapter(this.movieAdapter);
-        this.movieAdapter.notifyDataSetChanged();
+    public void updateUI(final List<Movie> movieListUpdated){
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                progressBar.setVisibility(View.GONE);
+                movieList = movieListUpdated;
+                movieAdapter = new MovieAdapter(MainActivity.this, movieList);
+                recyclerView.setAdapter(movieAdapter);
+                movieAdapter.notifyDataSetChanged();
+
+            }
+        });
+
     }
 
     @Override
@@ -68,6 +78,9 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.menu_top_rated:
                 executeAsyncTask(Constant.MOVIE_TOP_RATED);
+                break;
+            case R.id.menu_fav:
+                executeAsyncTask(Constant.MOVIE_FAVORITE);
                 break;
             default:
                 break;

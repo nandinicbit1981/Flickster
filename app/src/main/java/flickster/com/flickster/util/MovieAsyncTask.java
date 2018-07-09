@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import flickster.com.flickster.App;
 import flickster.com.flickster.BuildConfig;
 import flickster.com.flickster.activity.MainActivity;
 import flickster.com.flickster.model.Movie;
@@ -40,8 +41,13 @@ public class MovieAsyncTask extends AsyncTask<String, Integer, Void> {
             APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
             if(this.sort_order.equals(Constant.MOVIE_POPULAR)) {
                 movieResponse = apiInterface.getPopularMovieList(BuildConfig.My_Movie_DB_API_Key);
-            } else {
+            } else if( this.sort_order.equals(Constant.MOVIE_TOP_RATED)){
                 movieResponse = apiInterface.getTopRatedMovies(BuildConfig.My_Movie_DB_API_Key);
+            } else {
+                movies = App.get().getDB().movieDao().getAll();
+
+                ((MainActivity) context).updateUI(movies);
+                return null;
             }
             movieResponse.enqueue(new Callback<MovieResponse>() {
                 @Override
