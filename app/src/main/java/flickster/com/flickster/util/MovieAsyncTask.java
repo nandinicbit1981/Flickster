@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.List;
-import java.util.Properties;
 
 import flickster.com.flickster.BuildConfig;
 import flickster.com.flickster.activity.MainActivity;
@@ -57,6 +56,7 @@ public class MovieAsyncTask extends AsyncTask<String, Integer, Void> {
                 public void onFailure(Call<MovieResponse> responseCall, Throwable t) {
                     Log.e(LOG, responseCall.toString());
                 }
+
             });
         } catch(Exception e) {
             Log.e(LOG, e.getMessage());
