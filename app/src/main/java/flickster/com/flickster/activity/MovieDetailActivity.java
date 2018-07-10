@@ -33,7 +33,7 @@ import flickster.com.flickster.util.Constant;
 import flickster.com.flickster.util.ReviewAsyncTask;
 import flickster.com.flickster.util.TrailerAsyncTask;
 
-public class MovieDetailActivity extends BaseActivity implements TrailerClickInterface{
+public class MovieDetailActivity extends BaseActivity implements TrailerClickInterface {
 
     String LOG = MovieDetailActivity.class.getCanonicalName();
     @BindView(R.id.md_title)
@@ -64,6 +64,12 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
     ImageButton favBtn;
 
     Movie movie;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkIfFav();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +111,7 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
 
         // adding reviews
         new ReviewAsyncTask(MovieDetailActivity.this, movie.getId().toString()).execute();
-
+        checkIfFav();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -122,6 +128,35 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
         this.reviewAdapter.notifyDataSetChanged();
     }
 
+    public void checkIfFav(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (App.get().getDB().movieDao().findById(movie.getId()) != null) {
+                        updateFavIcon(true);
+                    }
+                } catch (Exception e) {
+                    Log.e(LOG, e.getMessage());
+                }
+            }
+        }).start();
+    }
+
+    private void updateFavIcon(final boolean isFav) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(isFav) {
+                    favBtn.setBackgroundResource(R.drawable.ic_favorite_filled);
+                } else {
+                    favBtn.setBackgroundResource(R.drawable.ic_favorite_border);
+                }
+            }
+        });
+
+    }
+
     @Override
     public void onTrailerClick(String id) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constant.YOUTUBE_URL + id));
@@ -131,10 +166,18 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
 
     @OnClick(R.id.fav_btn)
     public void onBtnClicked() {
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                App.get().getDB().movieDao().insert(movie);
+
+                if(App.get().getDB().movieDao().findById(movie.getId()) != null) {
+                    App.get().getDB().movieDao().delete(movie);
+                    updateFavIcon(false);
+                } else{
+                    App.get().getDB().movieDao().insert(movie);
+                    updateFavIcon(true);
+                }
             }
         }).start();
 

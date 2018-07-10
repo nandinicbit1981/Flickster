@@ -46,6 +46,7 @@ public class Movie implements Parcelable {
     private Boolean video;
     @SerializedName("vote_average")
     private Double voteAverage;
+    private Boolean favorite;
 
     public Movie(){
 
@@ -206,4 +207,12 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    public Boolean getFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(Boolean favorite) {
+        this.favorite = favorite;
+    }
 }

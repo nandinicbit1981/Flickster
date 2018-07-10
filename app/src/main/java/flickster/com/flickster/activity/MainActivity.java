@@ -1,6 +1,9 @@
 package flickster.com.flickster.activity;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -16,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import flickster.com.flickster.R;
 import flickster.com.flickster.data.MovieAdapter;
+import flickster.com.flickster.model.MainViewModel;
 import flickster.com.flickster.model.Movie;
 import flickster.com.flickster.util.Constant;
 import flickster.com.flickster.util.MovieAsyncTask;
@@ -70,6 +74,15 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
+    public void setUpViewModel(){
+        MainViewModel mainViewModel =  ViewModelProviders.of(this).get(MainViewModel.class);
+        mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                updateUI(movies);
+            }
+        });
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -80,7 +93,7 @@ public class MainActivity extends BaseActivity {
                 executeAsyncTask(Constant.MOVIE_TOP_RATED);
                 break;
             case R.id.menu_fav:
-                executeAsyncTask(Constant.MOVIE_FAVORITE);
+                setUpViewModel();
                 break;
             default:
                 break;

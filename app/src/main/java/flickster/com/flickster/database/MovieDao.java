@@ -1,5 +1,6 @@
 package flickster.com.flickster.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -14,10 +15,10 @@ import flickster.com.flickster.model.Movie;
 public interface MovieDao {
 
     @Query("SELECT * FROM movie")
-    List<Movie> getAll();
-//
-//    @Query("SELECT * FROM movie WHERE favorite is 1")
-//    List<Movie> findByFav(String name);
+    LiveData<List<Movie>> getAll();
+
+    @Query("SELECT * FROM movie WHERE id is :id")
+    LiveData<Movie> findById(Integer id);
 
     @Insert
     void insertAll(List<Movie> movies);
