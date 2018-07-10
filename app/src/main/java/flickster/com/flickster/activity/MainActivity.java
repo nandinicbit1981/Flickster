@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,6 +31,7 @@ import static flickster.com.flickster.util.Constant.MOVIE_POPULAR;
 
 public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String SCROLL_POSITION = "Scroll position";
     List<Movie> movieList = new ArrayList<>();
     MovieAdapter movieAdapter;
 
@@ -41,6 +41,7 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
     @BindView(R.id.mv_progress_bar)
     ProgressBar progressBar;
     SharedPreferences sharedPreferences;
+    int scrollPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,9 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
         ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
+        if(savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
+            scrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+        }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         getData();
@@ -89,6 +93,8 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
                 movieList = movieListUpdated;
                 movieAdapter = new MovieAdapter(MainActivity.this, movieList);
                 recyclerView.setAdapter(movieAdapter);
+                recyclerView.scrollToPosition(scrollPosition);
+
                 movieAdapter.notifyDataSetChanged();
 
             }
@@ -115,9 +121,13 @@ public class MainActivity extends BaseActivity implements SharedPreferences.OnSh
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState) {
+        int position = ((GridLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+        outState.putInt(SCROLL_POSITION, position);
+        super.onSaveInstanceState(outState);
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
