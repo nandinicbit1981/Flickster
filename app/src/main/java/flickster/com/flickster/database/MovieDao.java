@@ -20,6 +20,10 @@ public interface MovieDao {
     @Query("SELECT * FROM movie WHERE id is :id")
     LiveData<Movie> findById(Integer id);
 
+    @Query("SELECT * FROM movie WHERE id is :id")
+    Movie findByIdIfExists(Integer id);
+
+
     @Insert
     void insertAll(List<Movie> movies);
 

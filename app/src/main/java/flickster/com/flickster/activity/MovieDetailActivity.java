@@ -1,8 +1,12 @@
 package flickster.com.flickster.activity;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,6 +30,8 @@ import flickster.com.flickster.R;
 import flickster.com.flickster.data.ReviewAdapter;
 import flickster.com.flickster.data.TrailerAdapter;
 import flickster.com.flickster.interfaces.TrailerClickInterface;
+import flickster.com.flickster.model.AddMovieViewModel;
+import flickster.com.flickster.model.AddMovieViewModelFactory;
 import flickster.com.flickster.model.Movie;
 import flickster.com.flickster.model.Review;
 import flickster.com.flickster.model.Trailer;
@@ -65,6 +71,9 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
 
     Movie movie;
 
+    String MOVIE_INSTANCE = "Movie Instance";
+    int movieId;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -76,6 +85,10 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         ButterKnife.bind(this);
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(MOVIE_INSTANCE)) {
+            setUpViewModel(savedInstanceState.getInt(MOVIE_INSTANCE));
+        }
         movie = (Movie) getIntent().getExtras().get(Constant.MOVIE_INFO);
         tv_title.setText(movie.getTitle());
         Picasso.with(this)
@@ -113,6 +126,7 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
         new ReviewAsyncTask(MovieDetailActivity.this, movie.getId().toString()).execute();
         checkIfFav();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setUpViewModel(movieId);
     }
 
     public void updateTrailers(List<Trailer> trailers) {
@@ -133,7 +147,7 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
             @Override
             public void run() {
                 try {
-                    if (App.get().getDB().movieDao().findById(movie.getId()) != null) {
+                    if (App.get().getDB().movieDao().findByIdIfExists(movie.getId()) != null) {
                         updateFavIcon(true);
                     }
                 } catch (Exception e) {
@@ -171,7 +185,7 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
             @Override
             public void run() {
 
-                if(App.get().getDB().movieDao().findById(movie.getId()) != null) {
+                if(App.get().getDB().movieDao().findByIdIfExists(movie.getId()) != null) {
                     App.get().getDB().movieDao().delete(movie);
                     updateFavIcon(false);
                 } else{
@@ -180,6 +194,28 @@ public class MovieDetailActivity extends BaseActivity implements TrailerClickInt
                 }
             }
         }).start();
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putInt(MOVIE_INSTANCE, movieId);
+        super.onSaveInstanceState(outState, outPersistentState);
+
+    }
+
+    public void setUpViewModel(Integer movieId){
+        AddMovieViewModelFactory factory = new AddMovieViewModelFactory(App.get().getDB(), movieId);
+        final AddMovieViewModel viewModel = ViewModelProviders.of(this, factory).get(AddMovieViewModel.class);
+        viewModel.getMovieLiveData().observe(this, new Observer<Movie>() {
+            @Override
+            public void onChanged(@Nullable Movie movieFromVM) {
+                if(movieFromVM != null) {
+                    movie = movieFromVM;
+                }
+            }
+
+        });
 
     }
 }

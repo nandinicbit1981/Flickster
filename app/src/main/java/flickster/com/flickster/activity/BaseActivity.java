@@ -12,5 +12,6 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
         getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+
     }
 }

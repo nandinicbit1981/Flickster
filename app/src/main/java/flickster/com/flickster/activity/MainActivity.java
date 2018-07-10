@@ -2,7 +2,11 @@ package flickster.com.flickster.activity;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +28,9 @@ import flickster.com.flickster.model.Movie;
 import flickster.com.flickster.util.Constant;
 import flickster.com.flickster.util.MovieAsyncTask;
 
-public class MainActivity extends BaseActivity {
+import static flickster.com.flickster.util.Constant.MOVIE_POPULAR;
+
+public class MainActivity extends BaseActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     List<Movie> movieList = new ArrayList<>();
     MovieAdapter movieAdapter;
@@ -34,6 +40,7 @@ public class MainActivity extends BaseActivity {
 
     @BindView(R.id.mv_progress_bar)
     ProgressBar progressBar;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +50,35 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
-        executeAsyncTask(Constant.MOVIE_POPULAR);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        getData();
     }
 
     public void executeAsyncTask(String sort_order) {
         progressBar.setVisibility(View.VISIBLE);
         new MovieAsyncTask(this, sort_order).execute();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getData();
+    }
+
+    public void getData() {
+        //executeAsyncTask(Constant.MOVIE_POPULAR);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        String sort_option = sharedPreferences.getString(getResources().getString(R.string.pref_key), MOVIE_POPULAR);
+
+        if(sort_option.equals(Constant.MOVIE_FAVORITE)) {
+            setUpViewModel();
+        } else {
+            executeAsyncTask(sort_option);
+        }
+    }
+
     public void updateUI(final List<Movie> movieListUpdated){
         runOnUiThread(new Runnable() {
 
@@ -82,23 +111,31 @@ public class MainActivity extends BaseActivity {
                 updateUI(movies);
             }
         });
+
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_popular :
-                executeAsyncTask(Constant.MOVIE_POPULAR);
-                break;
-            case R.id.menu_top_rated:
-                executeAsyncTask(Constant.MOVIE_TOP_RATED);
-                break;
-            case R.id.menu_fav:
-                setUpViewModel();
-                break;
-            default:
-                break;
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            // launch settings activity
+            startActivity(new Intent(MainActivity.this, PreferenceActivity.class));
+            return true;
         }
 
-        return true;
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(getResources().getString(R.string.pref_key))){
+                executeAsyncTask(sharedPreferences.getString(key,""));
+        }
     }
 }

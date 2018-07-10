@@ -21,8 +21,12 @@
         </activity>
         <activity
             android:name=".activity.MovieDetailActivity"
-            android:parentActivityName=".activity.MainActivity"></activity>
-        <activity android:name=".activity.BaseActivity"></activity>
+            android:parentActivityName=".activity.MainActivity" />
+        <activity android:name=".activity.BaseActivity" />
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity android:name=".activity.PreferenceActivity"></activity>
     </application>
 
 </manifest>
